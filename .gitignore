@@ -1,0 +1,33 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Model files (optional, large)
+*.h5
+
+# Numpy embeddings (optional, can regenerate)
+*.npy
+
+# VS Code
+.vscode/
+
+# Streamlit cache
+.streamlit/
+
+# Environment variables
+.env
