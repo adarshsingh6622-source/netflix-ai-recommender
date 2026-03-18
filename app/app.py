@@ -3,15 +3,17 @@ import pandas as pd
 from recommender import recommend
 import os
 import requests
+from dotenv import load_dotenv
+load_dotenv()
 
-# 🔑 API KEY
-API_KEY = "2c86cf11"
+#  API KEY
+API_KEY = os.getenv("API_KEY")
 
-# 📁 Path fix
+#  Path fix
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 movies = pd.read_csv(os.path.join(BASE_DIR, "data", "movies.csv"))
 
-# 🧹 Movie name clean function
+#  Movie name clean function
 def clean_movie_name(title):
     title = title.split('(')[0].strip()
 
@@ -21,7 +23,7 @@ def clean_movie_name(title):
 
     return title
 
-# 🎬 Poster fetch function
+#  Poster fetch function
 def fetch_poster(movie_name):
     try:
         url = f"http://www.omdbapi.com/?apikey={API_KEY}&t={movie_name}"
@@ -33,50 +35,50 @@ def fetch_poster(movie_name):
     except:
         return None
 
-# 🎨 UI
+#  UI
 st.set_page_config(page_title="Netflix AI", layout="centered")
 
-st.title("🎬 Netflix AI Recommendation System")
-st.write("Enter a movie name and get similar recommendations 🍿")
+st.title(" Netflix AI Recommendation System")
+st.write("Enter a movie name and get similar recommendations ")
 
-# 🔍 Input
-movie_name = st.text_input("🔎 Enter Movie Name")
+#  Input
+movie_name = st.text_input(" Enter Movie Name")
 
-# 🚀 Button
+#  Button
 if st.button("Recommend"):
 
     if movie_name.strip() == "":
         st.warning("⚠️ Please enter a movie name")
 
     else:
-        # 🔍 Search movie
+        #  Search movie
         matched = movies[movies["title"].str.contains(movie_name, case=False, na=False)]
 
         if matched.empty:
-            st.error("❌ Movie not found")
+            st.error(" Movie not found")
 
         else:
-            # 🎯 Pick first match
+            #  Pick first match
             movie_id = matched.iloc[0]["movieId"]
             movie_title = matched.iloc[0]["title"]
 
-            st.success(f"🎬 Selected Movie: {movie_title}")
+            st.success(f" Selected Movie: {movie_title}")
 
-            # 🎬 Selected movie poster
+            #  Selected movie poster
             clean_title = clean_movie_name(movie_title)
             poster = fetch_poster(clean_title)
 
             if poster and poster != "N/A":
                 st.image(poster, width=200)
 
-            st.markdown(f"### 🎬 {movie_title}")
+            st.markdown(f"###  {movie_title}")
 
-            # 🎯 Recommendations
+            #  Recommendations
             results = recommend(movie_id)
 
-            st.subheader("🍿 Recommended Movies:")
+            st.subheader(" Recommended Movies:")
 
-            # 🎥 Show recommended movies
+            #  Show recommended movies
             for movie in results:
                 clean_name = clean_movie_name(movie)
                 poster = fetch_poster(clean_name)
