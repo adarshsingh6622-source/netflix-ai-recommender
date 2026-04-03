@@ -10,7 +10,7 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY")
 
 #  Path fix
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 movies = pd.read_csv(os.path.join(BASE_DIR, "data", "movies.csv"))
 
 #  Movie name clean function
@@ -87,12 +87,3 @@ if st.button("Recommend"):
                     st.image(poster, width=150)
 
                 st.write(movie)
-
-
-           
-
-
-
-            
-
-          
