@@ -5,3 +5,5 @@ scikit-learn
 streamlit
 faiss-cpu
 gradio
+python-dotenv
+requests

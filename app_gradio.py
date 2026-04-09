@@ -4,12 +4,20 @@ import requests
 import os
 from dotenv import load_dotenv
 from recommender import recommend
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 load_dotenv()
+try:
+    movies = pd.read_csv("data/movies.csv")
+    logger.info("Movies data load successfully")
+except Exception as e:
+    logger.error(f"Error loading movies data: {e}")
+    raise
 
 
-movies = pd.read_csv("data/movies.csv")
 API_KEY = os.getenv("API_KEY")
 
 def clean_movie_name(title):
@@ -33,12 +41,14 @@ def fetch_poster(movie_name):
         else:
             return "https://via.placeholder.com/300x450?text=No+Poster"
 
-    except:
+    except Exception as e:
+        logger.error(f"Poster fetch error: {e}")
         return "https://via.placeholder.com/300x450?text=Error"
 
 
 def interface(movie_name):
     try:
+        logger.info(f"User searched: {movie_name}")
         if not movie_name.strip():
             return "Please enter movie", None, []
 
@@ -47,18 +57,16 @@ def interface(movie_name):
         if matched.empty:
             return "Movie not found", None, []
 
-        movie_index = matched.index[0]
+        movie_index = int(matched.index[0])
         movie_title = matched.iloc[0]["title"]
 
         # selected poster
         selected_poster = fetch_poster(clean_movie_name(movie_title))
 
         # recommendations
-        names = recommend(movie_index)
-        selected_genre = movies.iloc[movie_index]['genres']
-        filtered = movies[movies['genres'].str.contains(selected_genre.split('|')[0], na=False)]
-        names = filtered['title'].head(5).tolist()
-
+        names = recommend(movie_index, top_k=5)
+        logger.info(f"Recommendations generated for: {movie_title}")
+        
         posters = []
         for movie in names:
             poster = fetch_poster(clean_movie_name(movie))
@@ -72,6 +80,7 @@ def interface(movie_name):
         return movie_title, selected_poster, posters
 
     except Exception as e:
+        logger.error(f"Error in interface: {e}")
         return f"Error: {str(e)}", None, []
 
 
@@ -84,7 +93,8 @@ demo = gr.Interface(
         gr.Gallery(label="Recommendations")
     ],
     title=" Netflix AI Recommendation System",
-    description="Enter a movie name and get 5 similar movies with posters"
+    description="Enter a movie name and get 5 similar AI-based recommendations with posters"
 )
+if __name__ == "__main__":
+    demo.launch()
 
-demo.launch()

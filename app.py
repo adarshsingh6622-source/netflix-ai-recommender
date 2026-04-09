@@ -5,6 +5,10 @@ import os
 import requests
 from dotenv import load_dotenv
 load_dotenv()
+import logging
+
+logging.basicConfig(filename="app.log", level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 #  API KEY
 API_KEY = os.getenv("API_KEY")
@@ -46,6 +50,7 @@ movie_name = st.text_input(" Enter Movie Name")
 
 #  Button
 if st.button("Recommend"):
+    logger.info(f"User clicked recommend button with input: {movie_name}")
 
     if movie_name.strip() == "":
         st.warning("⚠️ Please enter a movie name")
@@ -53,13 +58,15 @@ if st.button("Recommend"):
     else:
         #  Search movie
         matched = movies[movies["title"].str.contains(movie_name, case=False, na=False)]
+        logger.info(f"Movies matched: {len(matched)}")
 
         if matched.empty:
             st.error(" Movie not found")
+            logger.warning(f"Movie not found: {movie_name}")
 
         else:
             #  Pick first match
-            movie_id = matched.iloc[0]["movieId"]
+            movie_id = int(matched.index[0])
             movie_title = matched.iloc[0]["title"]
 
             st.success(f" Selected Movie: {movie_title}")
@@ -75,6 +82,7 @@ if st.button("Recommend"):
 
             #  Recommendations
             results = recommend(movie_id)
+            logger.info(f"Recommendations generated for movie_id {movie_id}")
 
             st.subheader(" Recommended Movies:")
 
